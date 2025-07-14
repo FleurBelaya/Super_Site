@@ -13,7 +13,7 @@ def create_tables():
     metadata_obj.create_all(engine)
     engine.echo = True
 
-
+#  ещё есть асинхронный вариант, но это синхронный
 def insert_data():
     with session_factory() as session:
         worker_sandy = WorkersOrm(cats_names='Sandy')

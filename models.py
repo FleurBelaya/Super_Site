@@ -4,6 +4,7 @@ from database import Base
 from sqlalchemy.orm import Mapped, mapped_column
 
 class WorkersOrm(Base):
+    _table_args_ = {"schema": "public"}
     __tablename__ = 'workers'
     id: Mapped[int] = mapped_column(primary_key=True)
     cats_names: Mapped[str]

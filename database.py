@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
-from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.orm import Session, sessionmaker, DeclarativeBase
 from sqlalchemy import URL, create_engine, text
 from config import settings
 
@@ -12,8 +12,10 @@ engine = create_engine(
     max_overflow=10
 )
 
-session = sessionmaker(engine)
+session_factory = sessionmaker(engine)
 
+class Base(DeclarativeBase):
+    pass
 
 
 

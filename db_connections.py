@@ -20,5 +20,7 @@ with engine.begin() as conn:
             age INTEGER
         )
     """))
+    conn.commit()
+
 
 print('successful')

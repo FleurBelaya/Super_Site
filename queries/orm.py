@@ -1,4 +1,4 @@
-from sqlalchemy import text, insert
+from sqlalchemy import text, insert, inspect, select
 from database import engine, session_factory
 from models import metadata_obj, WorkersOrm
 
@@ -28,6 +28,9 @@ class SyncORM:
         with session_factory() as session:
             worker_id = 1
             worker = session.get(WorkersOrm, worker_id)
+            query = select(WorkersOrm)  # SELECT * FROM WORKERS
+            res = session.execute(query)
+            print(f'{res.all()=}')
 
     @staticmethod
     def update_workers(worker_id: int = 1, new_username: str = 'Mura'):

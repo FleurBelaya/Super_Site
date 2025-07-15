@@ -18,8 +18,8 @@ class SyncORM:
     #  ещё есть асинхронный вариант, но это синхронный
     def insert_data():
         with session_factory() as session:
-            worker_sandy = WorkersOrm(cats_names='Sandy')
-            worker_candy = WorkersOrm(cats_names='Candy')
+            worker_sandy = WorkersOrm(username='Sandy')
+            worker_candy = WorkersOrm(username='Candy')
             session.add_all([worker_sandy, worker_candy])
             session.commit()
 
@@ -34,5 +34,11 @@ class SyncORM:
 
     @staticmethod
     def update_workers(worker_id: int = 1, new_username: str = 'Mura'):
-        with engine.connect() as conn:
-            pass
+        with session_factory() as session:
+            worker = session.get(WorkersOrm, worker_id)
+            worker.username = new_username
+            session.commit()
+
+    @classmethod
+    def insert_workers(cls):
+        pass

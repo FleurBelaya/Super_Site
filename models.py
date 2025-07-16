@@ -8,7 +8,7 @@ class WorkersOrm(Base):
     __tablename__ = 'workers'
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    cats_names: Mapped[str]
+    username: Mapped[str]
 
 # class ResumesOrm(Base):
 #     __tablename__ = "resumes"

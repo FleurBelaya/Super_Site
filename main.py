@@ -29,7 +29,7 @@ from queries.orm import SyncORM # AsyncORM
 # SyncCore.select_workers()
 
 SyncORM.create_tables()
+SyncORM.insert_workers()
 SyncORM.update_workers()
-# SyncORM.insert_workers()
 SyncORM.select_workers()
 

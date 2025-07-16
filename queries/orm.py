@@ -28,9 +28,9 @@ class SyncORM:
             # Не завершает транзакцию (commit() это делает)
             # Позволяет получить, например, сгенерированный id у объекта до commit
             # Пример!
-            # new_post = Post(title="Hello", user_id=new_user.id)
-            # db.add(new_post)
-            # db.flush()  # ! Теперь new_post.id уже есть !
+            # parent = Author(name="John")
+            # db.add(parent)
+            # db.flush()  # Получаем parent.id до коммита !
             session.commit()
 
     @staticmethod

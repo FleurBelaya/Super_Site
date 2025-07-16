@@ -10,6 +10,7 @@ from models import metadata_obj, WorkersOrm
 class SyncORM:
     @staticmethod
     def create_tables():
+        engine.echo = False
         metadata_obj.drop_all(engine)
         metadata_obj.create_all(engine)
         engine.echo = True
@@ -21,13 +22,23 @@ class SyncORM:
             worker_sandy = WorkersOrm(username='Sandy')
             worker_candy = WorkersOrm(username='Candy')
             session.add_all([worker_sandy, worker_candy])
+            session.flush()
+            # flush()
+            # Сохраняет изменения в базу в рамках текущей транзакции
+            # Не завершает транзакцию (commit() это делает)
+            # Позволяет получить, например, сгенерированный id у объекта до commit
+            # Пример!
+            # new_post = Post(title="Hello", user_id=new_user.id)
+            # db.add(new_post)
+            # db.flush()  # ! Теперь new_post.id уже есть !
             session.commit()
 
     @staticmethod
     def select_workers():
         with session_factory() as session:
-            worker_id = 1
-            worker = session.get(WorkersOrm, worker_id)
+            # worker_id = 1
+            # worker = session.get(WorkersOrm, worker_id)
+            # print(worker)
             query = select(WorkersOrm)  # SELECT * FROM WORKERS
             res = session.execute(query)
             print(f'{res.all()=}')

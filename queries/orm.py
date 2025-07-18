@@ -1,6 +1,6 @@
-from sqlalchemy import text, insert, inspect, select
-from database import engine, session_factory
-from models import metadata_obj, WorkersOrm
+from sqlalchemy import text, insert, inspect, select, cast, Integer, func, and_
+from database import engine, session_factory, Base
+from models import metadata_obj, WorkersOrm, ResumesOrm, Workload
 
 # def get_123_sync():
 #     with engine.connect() as conn:
@@ -11,8 +11,8 @@ class SyncORM:
     @staticmethod
     def create_tables():
         engine.echo = False
-        metadata_obj.drop_all(engine)
-        metadata_obj.create_all(engine)
+        Base.metadata.drop_all(engine)
+        Base.metadata.create_all(engine)
         engine.echo = True
 
     @staticmethod
@@ -48,4 +48,83 @@ class SyncORM:
         with session_factory() as session:
             worker = session.get(WorkersOrm, worker_id)
             worker.username = new_username
+
+            # session.expire_all()
+            # Обнуляет кэш всех объектов в сессии —
+            # при следующем доступе к полям произойдёт запрос к БД
+
+            # session.refresh(worker)
+            # Перезагружает объект worker из БД,
+            # чтобы получить самые актуальные значения
+
             session.commit()
+
+    @staticmethod
+    def insert_resumes():
+        with session_factory() as session:
+            resume_jack_1 = ResumesOrm(
+                title="Python Junior Developer",
+                compensation=50000,
+                workload=Workload.fulltime,
+                worker_id=1
+            )
+            resume_jack_2 = ResumesOrm(
+                title="Python Разработчик",
+                compensation=150000,
+                workload=Workload.fulltime,
+                worker_id=1
+            )
+            resume_michael_1 = ResumesOrm(
+                title="Python Data Engineer",
+                compensation=250000,
+                workload=Workload.parttime,
+                worker_id=2
+            )
+            resume_michael_2 = ResumesOrm(
+                title="Data Scientist",
+                compensation=300000,
+                workload=Workload.fulltime,
+                worker_id=2
+            )
+
+            session.add_all([
+                resume_jack_1,
+                resume_jack_2,
+                resume_michael_1,
+                resume_michael_2
+            ])
+            session.commit()
+
+        engine.echo = True
+
+    @staticmethod
+    def select_resumes_avg_compensation(like_language: str = "Python"):
+        """
+        SQL-подобный запрос:
+        select workload, avg(compensation)::int as avg_compensation
+        from resumes
+        where title like '%Python%' and compensation > 40000
+        group by workload
+        having avg(compensation)::int > 70000
+        """
+        with session_factory() as session:
+            query = (
+                select(
+                    ResumesOrm.workload,
+                    cast(func.avg(ResumesOrm.compensation), Integer).label("avg_compensation")
+                )
+                .select_from(ResumesOrm)
+                .filter(
+                    and_(
+                        ResumesOrm.title.contains(like_language),
+                        ResumesOrm.compensation > 40000
+                    )
+                )
+                .group_by(ResumesOrm.workload)
+                .having(cast(func.avg(ResumesOrm.compensation), Integer) > 70000)
+            )
+
+            print(query.compile(compile_kwargs={"literal_binds": True}))
+            res = session.execute(query)
+            result = res.all()
+            print(result[0].avg_compensation)

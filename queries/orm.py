@@ -1,5 +1,6 @@
 from sqlalchemy import text, insert, inspect, select, cast, Integer, func, and_
 from database import engine, session_factory, Base
+from sqlalchemy.orm import aliased
 from models import metadata_obj, WorkersOrm, ResumesOrm, Workload
 
 # def get_123_sync():
@@ -128,3 +129,54 @@ class SyncORM:
             res = session.execute(query)
             result = res.all()
             print(result[0].avg_compensation)
+
+    @staticmethod
+    def join_cte_subquery_window_func(like_language: str = 'Python'):
+        """
+        WITH helper2 AS (
+            SELECT *,
+                   compensation - avg_workload_compensation AS compensation_diff
+            FROM (
+                SELECT
+                    w.id,
+                    w.username,
+                    r.compensation,
+                    r.workload,
+                    AVG(r.compensation) OVER (PARTITION BY workload)::int AS avg_workload_compensation
+                FROM resumes r
+                JOIN workers w ON r.worker_id = w.id
+            ) AS helper1
+            )
+        SELECT *
+        FROM helper2
+        ORDER BY compensation_diff DESC;
+        """
+        r = aliased(ResumesOrm)
+        w = aliased(WorkersOrm)
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
